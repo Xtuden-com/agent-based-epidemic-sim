@@ -105,13 +105,18 @@ SmallWorldGraph::GenerateWattsStrogatzGraph(int n, int k, float p) {
       if (!ws->HasEdge(u, v % n)) continue;
       // Rewire with probability 'p'
       if (absl::Bernoulli(gen, p)) {
-        int w = u;
-        // Enforce no self-loops or duplicate edges. There is at least one
-        // available node.
-        while (w == u || ws->HasEdge(u, w)) {
-          // Generate a uniform value between [0, n-1].
-          w = absl::Uniform<int>(absl::IntervalClosedClosed, gen, 0, n - 1);
+        // Make a list of possible nodes.
+        std::vector<int> possible;
+        for (int w = 0; w < n; ++w) {
+          // Enforce no self-loops or duplicate edges.
+          if (w != u && !ws->HasEdge(u, w)) {
+            possible.push_back(w);
+          }
         }
+        // There is at least one available node.
+        CHECK_GT(possible.size(), 0);
+        // Pick a node randomly from possible nodes.
+        int w = possible[absl::Uniform(gen, 0u, possible.size())];
         // Rewire the edges.
         ws->RemoveEdge(u, v % n);
         ws->AddEdge(u, w);
