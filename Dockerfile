@@ -1,7 +1,7 @@
 # This file defines a docker container that can be used to build and test the
 # simulator.
 
-FROM ubuntu:20.04
+FROM ubuntu:rolling
 
 RUN apt-get -y update
 RUN apt-get -y upgrade
